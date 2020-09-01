@@ -14,21 +14,13 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void addWidgetToCurrentPage(QString name, QWidget* widget);
 
 private slots:
     void on_pushButton_clicked();
-    void fillColor();
-    void pickColor();
-    void submitGuess();
 
 private:
     Ui::MainWindow *ui;
-    QColor currentColor_;
-    int currentTry_;
-    QVector<QColor> colors_;
-    QVector<QColor> code_;
-    void generateCode();
-    QVector<int> checkGuess(QVector<QColor> guess);
 };
 
 #include <QPushButton>

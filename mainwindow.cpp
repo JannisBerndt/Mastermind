@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QLabel>
-#include <QRandomGenerator>
+#include "game.h"
 #include <QDebug>
 #include <QPainter>
 
@@ -50,121 +49,12 @@ void GuessButton::resizeEvent(QResizeEvent *event) {
 void MainWindow::on_pushButton_clicked()
 {
     this->ui->stackedWidget->setCurrentIndex(1);
-    // Fill all 12 rows
-    for(int i = 0; i < 12; i++) {
-        QLabel* label = new QLabel();
-        label->setText(QString::number(12-i));
-        label->setFixedWidth(15);
-        this->ui->gridLayout->addWidget(label, i, 0);
-
-        for(int j = 1; j < 5; j++) {
-            GuessButton* button = new GuessButton();
-            button->sizePolicy().setWidthForHeight(true);
-            if(i != 11) button->setEnabled(false);
-            connect(button, SIGNAL(clicked()),this, SLOT(fillColor()));
-            this->ui->gridLayout->addWidget(button, i, j, Qt::AlignCenter);
-        }
-        QWidget* placeholder = new QWidget();
-        placeholder->setFixedWidth(50);
-        this->ui->gridLayout->addWidget(placeholder, i, 5);
-    }
-
-    this->colors_ = {QColor(222, 222, 222), QColor(168, 17, 17), QColor(245, 241, 10), QColor(11, 128, 37), QColor(11, 32, 219), QColor(219, 11, 181)};
-    for(int i = 0; i < 6; i++) {
-        ColorSelectButton* button = new ColorSelectButton(colors_[i], this);
-        if(i == 0) {
-            button->setChecked(true);
-            this->currentColor_ = colors_[i];
-        }
-        connect(button, SIGNAL(clicked()),this, SLOT(pickColor()));
-        this->ui->horizontalLayout_2->addWidget(button);
-    }
-    this->currentTry_ = 1;
-    this->generateCode();
+    Game* currentGame = new Game(this);
+    addWidgetToCurrentPage("page_2", currentGame->getContent());
 }
 
-void MainWindow::fillColor() {
-    GuessButton* button = qobject_cast<GuessButton*>(sender());
-    button->setColor(this->currentColor_);
-    // check if all four are filled
-    QVector<QColor> colors;
-    for(int i = 1; i < 5; i++) {
-        colors.push_back(qobject_cast<GuessButton*>(this->ui->gridLayout->itemAtPosition(12 - this->currentTry_, i)->widget())->getColor());
-    }
-    bool valid = std::accumulate(colors.begin(), colors.end(), true, [](bool rest, QColor color) { return rest && color != QColor(0,0,0); } );
-    if(valid) {
-        // create "OK" Button
-        QPushButton* button = new QPushButton("OK");
-        button->setFixedWidth(50);
-        connect(button, SIGNAL(clicked()),this, SLOT(submitGuess()));
-        this->ui->gridLayout->addWidget(button, 12 - this->currentTry_, 5);
-    }
-}
-
-void MainWindow::pickColor() {
-    ColorSelectButton* button = qobject_cast<ColorSelectButton*>(sender());
-    this->currentColor_ = button->getColor();
-}
-
-void MainWindow::submitGuess() {
-    if(this->currentTry_ == 12) {
-        // Submitted the last Try
-
-    } else {
-        QVector<QColor> guess;
-        for(int i = 1; i < 5; i++) {
-            guess.push_back(qobject_cast<GuessButton*>(this->ui->gridLayout->itemAtPosition(12 - this->currentTry_, i)->widget())->getColor());
-        }
-        for(int i = 1; i < 5; i++) {
-            this->ui->gridLayout->itemAtPosition(12 - this->currentTry_, i)->widget()->setEnabled(false);
-            this->ui->gridLayout->itemAtPosition(12 - this->currentTry_ - 1, i)->widget()->setEnabled(true);
-        }
-        auto hint = this->checkGuess(guess);
-        this->ui->gridLayout->removeWidget(qobject_cast<QWidget*>(sender()));
-        delete sender();
-        // print hint
-        HintViewer* hints = new HintViewer(hint);
-        //hints->setFixedWidth(32);
-        //hints->setFixedHeight(32);
-        this->ui->gridLayout->addWidget(hints, 12 - this->currentTry_, 5);
-        this->currentTry_++;
-    }
-}
-
-void MainWindow::generateCode() {
-    for(int i = 0; i < 4; i++) {
-        this->code_.push_back(this->colors_[QRandomGenerator::global()->generate()%6]);
-    }
-}
-
-QVector<int> MainWindow::checkGuess(QVector<QColor> guess) {
-    // -1 is no match, 0 is inside code but not the correct position, 1 correct position
-    assert(guess.length() == this->code_.length());
-    QVector<int> hint;
-    QVector<QColor> code_copy(this->code_);
-    for(int i = 0; i < guess.length(); i++) {
-        qInfo() << guess[i].name() << " | " << code_copy[i].name();
-        if(code_copy[i] == guess[i]) {
-            code_copy.removeAt(i);
-            guess.removeAt(i);
-            hint.push_back(1);
-            i--;
-        }
-    }
-    qInfo() << "-----------------------------------";
-    for(int i = 0; i < guess.length(); i++) {
-        if(code_copy.contains(guess[i])) {
-            code_copy.removeOne(guess[i]);
-            guess.removeAt(i);
-            hint.push_back(0);
-            i--;
-        }
-    }
-    assert(this->code_.length() - hint.length() == guess.length());
-    for(int i = 0; i < guess.length(); i++) {
-        hint.push_back(-1);
-    }
-    return hint;
+void MainWindow::addWidgetToCurrentPage(QString name, QWidget* widget) {
+    this->findChild<QWidget*>(name)->layout()->addWidget(widget);
 }
 
 ColorSelectButton::ColorSelectButton(QColor color, QWidget* parent) : QRadioButton(parent), color_(color) {
