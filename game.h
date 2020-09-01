@@ -27,6 +27,8 @@ private:
 
     void generateCode();
     QVector<int> checkGuess(QVector<QColor> guess);
+    void wonGame();
+    void lostGame();
 };
 
 #endif // GAME_H

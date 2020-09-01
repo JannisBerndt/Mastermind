@@ -50,11 +50,11 @@ void MainWindow::on_pushButton_clicked()
 {
     this->ui->stackedWidget->setCurrentIndex(1);
     Game* currentGame = new Game(this);
-    addWidgetToCurrentPage("page_2", currentGame->getContent());
+    addWidgetToPage("page_2", currentGame->getContent());
 }
 
-void MainWindow::addWidgetToCurrentPage(QString name, QWidget* widget) {
-    this->findChild<QWidget*>(name)->layout()->addWidget(widget);
+void MainWindow::addWidgetToPage(QString pageName, QWidget* widget) {
+    this->findChild<QWidget*>(pageName)->layout()->addWidget(widget);
 }
 
 ColorSelectButton::ColorSelectButton(QColor color, QWidget* parent) : QRadioButton(parent), color_(color) {

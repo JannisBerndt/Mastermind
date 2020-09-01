@@ -99,10 +99,17 @@ void Game::submitGuess() {
         delete sender();
         // print hint
         HintViewer* hints = new HintViewer(hint);
-        //hints->setFixedWidth(32);
-        //hints->setFixedHeight(32);
         this->uiGridLayout_->addWidget(hints, 12 - this->numCurrentGuess_, 5);
         this->numCurrentGuess_++;
+        if(hint == QVector<int> {1, 1, 1, 1}) {
+            this->wonGame();
+        }
+    }
+}
+
+void Game::wonGame() {
+    for(int i = 1; i < 5; i++) {
+        this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, i)->widget()->setEnabled(false);
     }
 }
 

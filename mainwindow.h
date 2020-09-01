@@ -14,7 +14,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void addWidgetToCurrentPage(QString name, QWidget* widget);
+    void addWidgetToPage(QString pageName, QWidget* widget);
 
 private slots:
     void on_pushButton_clicked();
