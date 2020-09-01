@@ -15,7 +15,61 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_pushButton_clicked();
+    void fillColor();
+    void pickColor();
+    void submitGuess();
+
 private:
     Ui::MainWindow *ui;
+    QColor currentColor_;
+    int currentTry_;
+    QVector<QColor> colors_;
+    QVector<QColor> code_;
+    void generateCode();
+    QVector<int> checkGuess(QVector<QColor> guess);
 };
+
+#include <QPushButton>
+#include <QColor>
+
+class GuessButton : public QPushButton {
+    Q_OBJECT
+
+public:
+    GuessButton(QWidget *parent = nullptr);
+    QColor getColor();
+    void setColor(QColor newColor);
+    int heightForWidth(int w) const override;
+    void resizeEvent(QResizeEvent *event) override;
+
+private:
+    QColor color_;
+};
+
+#include <QRadioButton>
+
+class ColorSelectButton : public QRadioButton {
+    Q_OBJECT
+
+public:
+    ColorSelectButton(QColor color, QWidget* parent = nullptr);
+    QColor getColor();
+
+private:
+    QColor color_;
+};
+
+class HintViewer : public QWidget {
+    Q_OBJECT
+
+public:
+    HintViewer(QVector<int> hint, QWidget* parent = nullptr);
+    void paintEvent(QPaintEvent *event) override;
+
+private:
+    QVector<int> hint_;
+};
+
 #endif // MAINWINDOW_H
