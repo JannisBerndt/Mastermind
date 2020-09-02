@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>566</width>
-    <height>658</height>
+    <width>575</width>
+    <height>688</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,17 +23,52 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="page">
+      <widget class="QWidget" name="page_1">
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="playButton">
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::NoFocus</enum>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+	padding: 10px;
+	font: 12pt &quot;MS Shell Dlg 2&quot;;
+	border: 2px solid #ff9c08;
+	background-color: #ffb108;
+	border-radius: 15px;
+}
+
+:pressed {
+	background-color: #ffa908;
+}</string>
+          </property>
           <property name="text">
            <string>Spielen</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="settingsButton">
+          <property name="focusPolicy">
+           <enum>Qt::NoFocus</enum>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+	padding: 10px;
+	font: 12pt &quot;MS Shell Dlg 2&quot;;
+	border: 2px solid #ff9c08;
+	background-color: #ffb108;
+	border-radius: 15px;
+}
+
+:pressed {
+	background-color: #ffa908;
+}</string>
+          </property>
           <property name="text">
            <string>Einstellungen</string>
           </property>
@@ -45,6 +80,9 @@
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <property name="spacing">
+           <number>6</number>
+          </property>
           <item>
            <widget class="QPushButton" name="pushButton_51">
             <property name="text">
@@ -92,7 +130,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>566</width>
+     <width>575</width>
      <height>21</height>
     </rect>
    </property>

@@ -17,7 +17,7 @@ public:
     void addWidgetToPage(QString pageName, QWidget* widget);
 
 private slots:
-    void on_pushButton_clicked();
+    void playGame();
 
 private:
     Ui::MainWindow *ui;
@@ -35,6 +35,7 @@ public:
     void setColor(QColor newColor);
     int heightForWidth(int w) const override;
     void resizeEvent(QResizeEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 
 private:
     QColor color_;
@@ -48,6 +49,7 @@ class ColorSelectButton : public QRadioButton {
 public:
     ColorSelectButton(QColor color, QWidget* parent = nullptr);
     QColor getColor();
+    void paintEvent(QPaintEvent *event) override;
 
 private:
     QColor color_;
@@ -62,6 +64,15 @@ public:
 
 private:
     QVector<int> hint_;
+};
+
+class StyleSheetFactory {
+public:
+    StyleSheetFactory();
+
+private:
+    QString staticSheet_;
+    QMap<QString, QString> arguments_();
 };
 
 #endif // MAINWINDOW_H
