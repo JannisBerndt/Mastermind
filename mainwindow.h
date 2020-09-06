@@ -33,9 +33,10 @@ public:
     GuessButton(QWidget *parent = nullptr);
     QColor getColor();
     void setColor(QColor newColor);
-    int heightForWidth(int w) const override;
+    int widthForHeight(int h) const;
     void resizeEvent(QResizeEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
+    QSize sizeHint() const override;
 
 private:
     QColor color_;
@@ -50,6 +51,8 @@ public:
     ColorSelectButton(QColor color, QWidget* parent = nullptr);
     QColor getColor();
     void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent* event) override;
+    QSize sizeHint() const override;
 
 private:
     QColor color_;

@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QGraphicsEffect>
 #include <QLabel>
+#include <QResizeEvent>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -33,12 +34,15 @@ MainWindow::~MainWindow()
 }
 
 GuessButton::GuessButton(QWidget *parent) : QPushButton(parent) {
-    this->setFixedWidth(30);
-    this->setFixedHeight(30);
     this->setStyleSheet("border:3px solid orange;"
                         "border-radius: 15px;"
                         "background-color: black;");
+    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     this->color_ = QColor(0,0,0);
+    this->setMinimumSize(QSize(30,30));
+    QSizePolicy sp = this->sizePolicy();
+    sp.setWidthForHeight(true);
+    this->setSizePolicy(sp);
 }
 
 QColor GuessButton::getColor() {
@@ -52,18 +56,39 @@ void GuessButton::setColor(QColor newColor) {
                         "background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.35, fy:0.35, stop:0 rgb(255, 255, 255), stop:1 " + newColor.name() + ");");
 }
 
-int GuessButton::heightForWidth(int w) const {
-    return w;
+int GuessButton::widthForHeight(int h) const {
+    return h;
 }
 
 void GuessButton::resizeEvent(QResizeEvent *event) {
-    QPushButton::resizeEvent(event);
-    //this->setStyleSheet(QStringLiteral("border-radius: %1px;"
-    //                                   "background-color: orange;").arg(this->width()/2));
+    if(true) {
+        int dim = qMin(this->width(), this->height());
+        int oldWidth = this->width();
+        qInfo() << dim << ", " << event->oldSize() << ", " << event->size() << ", " << (event->oldSize() != event->size());
+        this->resize(dim, dim);
+        this->move(this->x()+(oldWidth-dim)/2, this->y());
+        if(this->color_ == QColor(0,0,0)) {
+            this->setStyleSheet("border:3px solid orange;"
+                                "border-radius: " + QString::number(dim/2) + "px;"
+                                "background-color: black;");
+        } else {
+            this->setStyleSheet("border:3px solid orange;"
+                                "border-radius: " + QString::number(dim/2) + "px;"
+                                "background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.35, fy:0.35, stop:0 rgb(255, 255, 255), stop:1 " + this->color_.name() + ");");
+        }
+    }
+    QWidget::resizeEvent(event);
 }
 
 void GuessButton::paintEvent(QPaintEvent *event) {
     QPushButton::paintEvent(event);
+}
+
+QSize GuessButton::sizeHint() const {
+    QSize originalHint = QWidget::sizeHint();
+    int dim = qMax(this->width(), this->height());
+    qInfo() << "GuessButton::sizeHint, dim = " << dim;
+    return originalHint;
 }
 
 void MainWindow::playGame() {
@@ -77,16 +102,19 @@ void MainWindow::addWidgetToPage(QString pageName, QWidget* widget) {
 }
 
 ColorSelectButton::ColorSelectButton(QColor color, QWidget* parent) : QRadioButton(parent), color_(color) {
-    this->setFixedWidth(36);
-    this->setFixedHeight(36);
+    this->setMinimumWidth(30);
+    this->setMinimumHeight(30);
+    this->setObjectName("color");
     this->setStyleSheet("::indicator {height: 30px; width: 30px; border: 3px solid black; border-radius: 18px; background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.35, fy:0.35, stop:0 rgb(255, 255, 255), stop:1 " + color_.name() + ");}"
-                        "::indicator:checked {border: 3px solid #62ff08;}");
+                        "::indicator:checked {border: 3px solid #62ff08;}"
+                        "#color {border: 2px solid black;}");
     QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect;
     shadow->setColor(Qt::black);
     shadow->setBlurRadius(10);
     shadow->setOffset(QPointF(0, 0));
     this->setGraphicsEffect(shadow);
     this->setCursor(Qt::PointingHandCursor);
+    this->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum));
 }
 
 QColor ColorSelectButton::getColor()  {
@@ -95,6 +123,17 @@ QColor ColorSelectButton::getColor()  {
 
 void ColorSelectButton::paintEvent(QPaintEvent *event) {
     QRadioButton::paintEvent(event);
+}
+
+void ColorSelectButton::resizeEvent(QResizeEvent *event) {
+    qInfo() << "ColorSelectButton::resizeEvent, height = " << this->height();
+    //this->resize(this->height_, this->height_);
+    QWidget::resizeEvent(event);
+}
+
+QSize ColorSelectButton::sizeHint() const {
+    qInfo() << "ColorSelectButton::sizeHint";
+    return QWidget::sizeHint();
 }
 
 HintViewer::HintViewer(QVector<int> hint, QWidget* parent) : QWidget(parent), hint_(hint) {
