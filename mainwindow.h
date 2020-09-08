@@ -33,13 +33,28 @@ public:
     GuessButton(QWidget *parent = nullptr);
     QColor getColor();
     void setColor(QColor newColor);
-    int widthForHeight(int h) const;
     void resizeEvent(QResizeEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     QSize sizeHint() const override;
 
 private:
     QColor color_;
+};
+
+class GuessButtonContainer : public QWidget {
+    Q_OBJECT
+
+public:
+    GuessButtonContainer(QWidget* parent = nullptr);
+    QVector<GuessButton*> getButtons();
+    void resizeEvent(QResizeEvent *event) override;
+    void forEveryButtonDo(void (*func) (GuessButton*));
+    QSize sizeHint() const override;
+    QVector<QColor> getFullGuess();
+    bool isCurrentGuessValid();
+
+private:
+    QVector<GuessButton*> buttons_;
 };
 
 #include <QRadioButton>

@@ -34,12 +34,13 @@ Game::Game(QMainWindow* mainwindow, QWidget *parent) : QWidget(parent) {
         label->setFixedWidth(15);
         gridLayout->addWidget(label, i, 0);
 
-        for(int j = 1; j < 5; j++) {
-            GuessButton* button = new GuessButton(scrollAreaWidget);
-            if(i != 11) button->setEnabled(false);
-            connect(button, SIGNAL(clicked()),this, SLOT(putColorGuess()));
-            gridLayout->addWidget(button, i, j);
+        GuessButtonContainer* buttonContainer = new GuessButtonContainer(scrollAreaWidget);
+        if(i != 11) buttonContainer->forEveryButtonDo([](GuessButton* button) {button->setEnabled(false);} );
+        for(auto button : buttonContainer->getButtons()) {
+            connect(button, SIGNAL(clicked()), this, SLOT(putColorGuess()));
         }
+        gridLayout->addWidget(buttonContainer, i, 1);
+
         QPushButton* button = new QPushButton(scrollAreaWidget);
         button->setText("Submit");
         button->setFixedWidth(50);
@@ -59,11 +60,11 @@ Game::Game(QMainWindow* mainwindow, QWidget *parent) : QWidget(parent) {
         shadow->setOffset(QPointF(0, 0));
         button->setGraphicsEffect(shadow);
         connect(button, SIGNAL(clicked()),this, SLOT(submitGuess()));
-        this->uiGridLayout_->addWidget(button, i, 5, Qt::AlignCenter);
+        this->uiGridLayout_->addWidget(button, i, 2, Qt::AlignCenter);
         QSizePolicy sp = button->sizePolicy();
         sp.setRetainSizeWhenHidden(true);
         button->setSizePolicy(sp);
-        button->hide();
+        button->setVisible(false);
     }
 
     QVector<QColor> colors = {QColor(222, 222, 222), QColor(168, 17, 17), QColor(245, 241, 10), QColor(11, 128, 37), QColor(11, 32, 219), QColor(219, 11, 181)};
@@ -82,24 +83,17 @@ void Game::putColorGuess() {
     GuessButton* button = qobject_cast<GuessButton*>(sender());
     button->setColor(this->colorButtonsHandler_->getSelectedColor());
     // check if all four are filled
-    QVector<QColor> colors;
-    for(int i = 1; i < 5; i++) {
-        colors.push_back(qobject_cast<GuessButton*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, i)->widget())->getColor());
-    }
-    bool valid = std::accumulate(colors.begin(), colors.end(), true, [](bool rest, QColor color) { return rest && color != QColor(0,0,0); } );
-    if(valid) {
+
+    if(qobject_cast<GuessButtonContainer*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->isCurrentGuessValid()) {
         // show "Submit" Button
-        this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 5)->widget()->setVisible(true);
+        this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 2)->widget()->setVisible(true);
     }
 }
 
 void Game::submitGuess() {
     assert(this->numCurrentGuess_ <= 12);
     // gather current guess
-    QVector<QColor> guess;
-    for(int i = 1; i < 5; i++) {
-        guess.push_back(qobject_cast<GuessButton*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, i)->widget())->getColor());
-    }
+    QVector<QColor> guess = qobject_cast<GuessButtonContainer*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->getFullGuess();
     // produce hint
     auto hint = this->checkGuess(guess);
     // remove Submit button
@@ -107,7 +101,7 @@ void Game::submitGuess() {
     delete sender();
     // print hint
     HintViewer* hints = new HintViewer(hint);
-    this->uiGridLayout_->addWidget(hints, 12 - this->numCurrentGuess_, 5);
+    this->uiGridLayout_->addWidget(hints, 12 - this->numCurrentGuess_, 2);
     // guess correct? if not, check whether more trys possible
     if(hint == QVector<int> {1, 1, 1, 1}) {
         this->endGame(true);
@@ -115,10 +109,8 @@ void Game::submitGuess() {
         // Submitted the last Try and lost
         this->endGame(false);
     } else {
-        for(int i = 1; i < 5; i++) {
-            this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, i)->widget()->setEnabled(false);
-            this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_ - 1, i)->widget()->setEnabled(true);
-        }
+        qobject_cast<GuessButtonContainer*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->forEveryButtonDo([](GuessButton* button) {button->setEnabled(false);} );
+        qobject_cast<GuessButtonContainer*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_ - 1, 1)->widget())->forEveryButtonDo([](GuessButton* button) {button->setEnabled(true);} );
         this->numCurrentGuess_++;
     }
 }
@@ -126,7 +118,7 @@ void Game::submitGuess() {
 void Game::endGame(bool hasWon) {
     qInfo() << "endGame: " << this->mainwindow_->width() << ", " << this->mainwindow_->height() << ", " << this->parentWidget()->objectName();
     for(int i = 1; i < 5; i++) {
-        this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, i)->widget()->setEnabled(false);
+        qobject_cast<GuessButtonContainer*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->forEveryButtonDo([](GuessButton* button) {button->setEnabled(false);} );
     }
     EndScreen* end = new EndScreen(hasWon, this->mainwindow_);
     this->endScreen_ = end;
@@ -283,7 +275,6 @@ QWidget* EndScreen::getBlocker() {
 }
 
 ColorSelectButtonsHandler::ColorSelectButtonsHandler(QVector<QColor> colors, QWidget* parent) : QWidget(parent) {
-    this->setStyleSheet("border:2px solid black;");
     this->colors_ = colors;
     QHBoxLayout* colorSelectButtonsLayout = new QHBoxLayout(this);
     colorSelectButtonsLayout->setContentsMargins(0, 7, 0, 7);
@@ -294,6 +285,7 @@ ColorSelectButtonsHandler::ColorSelectButtonsHandler(QVector<QColor> colors, QWi
             this->selectedColor_ = colors_[i];
         }
         connect(button, SIGNAL(clicked()),this, SLOT(selectColor()));
+        this->buttons_.push_back(button);
         colorSelectButtonsLayout->addWidget(button);
     }
     this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
@@ -310,11 +302,15 @@ QColor ColorSelectButtonsHandler::getSelectedColor() {
 }
 
 void ColorSelectButtonsHandler::resizeEvent(QResizeEvent *event) {
+    for(auto button : this->buttons_) {
+        button->updateGeometry();
+        //qInfo() << button->width() - button->height();
+    }
     QWidget::resizeEvent(event);
 }
 
 QSize ColorSelectButtonsHandler::sizeHint() const {
-    qInfo() << "ColorSelectButtonsHandler::sizeHint, height = " << this->height_;
+    //qInfo() << "ColorSelectButtonsHandler::sizeHint, height = " << this->height_;
     return QSize(this->width(), this->height_);
 }
 

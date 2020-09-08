@@ -36,6 +36,7 @@ private slots:
 private:
     QVector<QColor> colors_;
     QColor selectedColor_;
+    QVector<ColorSelectButton*> buttons_;
     int height_;
 };
 
