@@ -67,7 +67,27 @@ void GuessButton::resizeEvent(QResizeEvent *event) {
 }
 
 void GuessButton::paintEvent(QPaintEvent *event) {
-    QPushButton::paintEvent(event);
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    QPainterPath path;
+    path.addEllipse(QRectF(2, 2, this->width()-4, this->height()-4));
+    if(this->isDown()) {
+        painter.setPen(QPen(QColor(98, 255, 8), 4));
+    } else {
+        painter.setPen(QPen(QColor(255, 157, 10), 4));
+    }
+    if(this->color_ != QColor(0, 0, 0)) {
+        QRadialGradient radialGradient(QPointF(this->width()/2, this->height()/2), this->height()/2, QPointF(this->width()/2.5, this->height()/2.5));
+        radialGradient.setColorAt(0, Qt::white);
+        radialGradient.setColorAt(1, this->color_);
+        painter.fillPath(path, radialGradient);
+    } else {
+        QRadialGradient radialGradient(QPointF(this->width()/2, this->height()/2), this->height()/2);
+        radialGradient.setColorAt(0, this->color_);
+        radialGradient.setColorAt(1, Qt::white);
+        painter.fillPath(path, radialGradient);
+    }
+    painter.drawPath(path);
 }
 
 QSize GuessButton::sizeHint() const {
