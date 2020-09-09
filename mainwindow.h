@@ -33,7 +33,6 @@ public:
     GuessButton(QWidget *parent = nullptr);
     QColor getColor();
     void setColor(QColor newColor);
-    void resizeEvent(QResizeEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     QSize sizeHint() const override;
 

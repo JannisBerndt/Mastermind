@@ -34,9 +34,6 @@ MainWindow::~MainWindow()
 }
 
 GuessButton::GuessButton(QWidget *parent) : QPushButton(parent) {
-    this->setStyleSheet("border:3px solid orange;"
-                        "border-radius: 15px;"
-                        "background-color: black;");
     this->color_ = QColor(0,0,0);
     this->setMinimumSize(QSize(30,30));
     this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -48,22 +45,6 @@ QColor GuessButton::getColor() {
 
 void GuessButton::setColor(QColor newColor) {
     this->color_ = newColor;
-    this->setStyleSheet("border:3px solid orange;"
-                        "border-radius: 15px;"
-                        "background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.35, fy:0.35, stop:0 rgb(255, 255, 255), stop:1 " + newColor.name() + ");");
-}
-
-void GuessButton::resizeEvent(QResizeEvent *event) {
-    if(this->color_ == QColor(0,0,0)) {
-        this->setStyleSheet("border:3px solid orange;"
-                            "border-radius: " + QString::number(this->width()/2) + "px;"
-                            "background-color: black;");
-    } else {
-        this->setStyleSheet("border:3px solid orange;"
-                            "border-radius: " + QString::number(this->width()/2) + "px;"
-                            "background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.35, fy:0.35, stop:0 rgb(255, 255, 255), stop:1 " + this->color_.name() + ");");
-    }
-    QWidget::resizeEvent(event);
 }
 
 void GuessButton::paintEvent(QPaintEvent *event) {
@@ -92,7 +73,6 @@ void GuessButton::paintEvent(QPaintEvent *event) {
 
 QSize GuessButton::sizeHint() const {
     int length = qMin(this->parentWidget()->height(), (this->parentWidget()->width() - (this->parentWidget()->layout()->spacing()*3))/4);
-    //qInfo() << "GuessButton::sizeHint, dim = " << length;
     return QSize(length, length);
 }
 
