@@ -155,7 +155,20 @@ QColor ColorSelectButton::getColor()  {
 }
 
 void ColorSelectButton::paintEvent(QPaintEvent *event) {
-    QRadioButton::paintEvent(event);
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    QPainterPath path;
+    path.addEllipse(QRectF(2, 2, this->width()-4, this->height()-4));
+    if(this->isChecked()) {
+        painter.setPen(QPen(QColor(98, 255, 8), 4));
+    } else {
+        painter.setPen(QPen(QColor(0, 0, 0), 4));
+    }
+    QRadialGradient radialGradient(QPointF(this->width()/2, this->height()/2), this->height()/2, QPointF(this->width()/2.5, this->height()/2.5));
+    radialGradient.setColorAt(0, Qt::white);
+    radialGradient.setColorAt(1, this->color_);
+    painter.fillPath(path, radialGradient);
+    painter.drawPath(path);
 }
 
 void ColorSelectButton::resizeEvent(QResizeEvent *event) {
