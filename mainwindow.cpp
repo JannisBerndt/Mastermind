@@ -33,8 +33,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+const QColor GuessButton::colorEmpty = QColor(0, 0, 0);
+
 GuessButton::GuessButton(QWidget *parent) : QPushButton(parent) {
-    this->color_ = QColor(0,0,0);
+    this->color_ = this->colorEmpty;
     this->setMinimumSize(QSize(30,30));
     this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
@@ -48,7 +50,7 @@ void GuessButton::setColor(QColor newColor) {
     this->repaint();
 }
 
-void GuessButton::paintEvent(QPaintEvent *event) {
+void GuessButton::paintEvent(QPaintEvent*) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     QPainterPath path;
@@ -58,7 +60,7 @@ void GuessButton::paintEvent(QPaintEvent *event) {
     } else {
         painter.setPen(QPen(QColor(255, 157, 10), 4));
     }
-    if(this->color_ != QColor(0, 0, 0)) {
+    if(this->color_ != this->colorEmpty) {
         QRadialGradient radialGradient(QPointF(this->width()/2, this->height()/2), this->height()/2, QPointF(this->width()/2.5, this->height()/2.5));
         radialGradient.setColorAt(0, Qt::white);
         radialGradient.setColorAt(1, this->color_);
@@ -122,7 +124,7 @@ QVector<QColor> GuessButtonsHandler::getFullGuess() {
 
 bool GuessButtonsHandler::isCurrentGuessValid() {
     auto colors = this->getFullGuess();
-    bool valid = std::accumulate(colors.begin(), colors.end(), true, [](bool rest, QColor color) { return rest && color != QColor(0,0,0); } );
+    bool valid = std::accumulate(colors.begin(), colors.end(), true, [](bool rest, QColor color) { return rest && color != GuessButton::colorEmpty; } );
     return valid;
 }
 
@@ -153,7 +155,7 @@ QColor ColorSelectButton::getColor()  {
     return this->color_;
 }
 
-void ColorSelectButton::paintEvent(QPaintEvent *event) {
+void ColorSelectButton::paintEvent(QPaintEvent*) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     QPainterPath path;

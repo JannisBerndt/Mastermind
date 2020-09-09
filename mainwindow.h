@@ -35,6 +35,7 @@ public:
     void setColor(QColor newColor);
     void paintEvent(QPaintEvent *event) override;
     QSize sizeHint() const override;
+    static const QColor colorEmpty;
 
 private:
     QColor color_;
@@ -81,15 +82,6 @@ public:
 
 private:
     QVector<int> hint_;
-};
-
-class StyleSheetFactory {
-public:
-    StyleSheetFactory();
-
-private:
-    QString staticSheet_;
-    QMap<QString, QString> arguments_();
 };
 
 #endif // MAINWINDOW_H
