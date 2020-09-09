@@ -139,9 +139,6 @@ void MainWindow::addWidgetToPage(QString pageName, QWidget* widget) {
 ColorSelectButton::ColorSelectButton(QColor color, QWidget* parent) : QRadioButton(parent), color_(color) {
     this->setMinimumWidth(30);
     this->setMinimumHeight(30);
-    this->setObjectName("color");
-    this->setStyleSheet("::indicator {height: 30px; width: 30px; border: 3px solid black; border-radius: 18px; background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.35, fy:0.35, stop:0 rgb(255, 255, 255), stop:1 " + color_.name() + ");}"
-                        "::indicator:checked {border: 3px solid #62ff08;}");
     QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect;
     shadow->setColor(Qt::black);
     shadow->setBlurRadius(10);
@@ -172,15 +169,9 @@ void ColorSelectButton::paintEvent(QPaintEvent *event) {
     painter.drawPath(path);
 }
 
-void ColorSelectButton::resizeEvent(QResizeEvent *event) {
-    this->setStyleSheet("::indicator {height: " + QString::number(this->height()-6) + "px; width: " + QString::number(this->width()-6) + "px; border: 3px solid black; border-radius: " + QString::number((this->width())/2) + "px; background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.35, fy:0.35, stop:0 rgb(255, 255, 255), stop:1 " + color_.name() + ");}"
-                        "::indicator:checked {border: 3px solid #62ff08;}");
-}
-
 QSize ColorSelectButton::sizeHint() const {
     int parentVerticalMargins = this->parentWidget()->layout()->contentsMargins().top() + this->parentWidget()->layout()->contentsMargins().bottom();
     int length = qMin(this->parentWidget()->height()-parentVerticalMargins, (this->parentWidget()->width() - (this->parentWidget()->layout()->spacing()*5))/6);
-    //qInfo() << "ColorSelectButton::sizeHint, length = " << length;
     return QSize(length, length);
 }
 

@@ -65,7 +65,6 @@ public:
     ColorSelectButton(QColor color, QWidget* parent = nullptr);
     QColor getColor();
     void paintEvent(QPaintEvent *event) override;
-    void resizeEvent(QResizeEvent* event) override;
     QSize sizeHint() const override;
 
 private:
