@@ -77,7 +77,7 @@ QSize GuessButton::sizeHint() const {
     return QSize(length, length);
 }
 
-GuessButtonContainer::GuessButtonContainer(QWidget* parent) : QWidget(parent) {
+GuessButtonsHandler::GuessButtonsHandler(QWidget* parent) : QWidget(parent) {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     for(int i = 0; i < 4; i++) {
@@ -88,31 +88,31 @@ GuessButtonContainer::GuessButtonContainer(QWidget* parent) : QWidget(parent) {
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
 }
 
-QVector<GuessButton*> GuessButtonContainer::getButtons() {
+QVector<GuessButton*> GuessButtonsHandler::getButtons() {
     return this->buttons_;
 }
 
-void GuessButtonContainer::resizeEvent(QResizeEvent *event) {
+void GuessButtonsHandler::resizeEvent(QResizeEvent *event) {
     for(auto button : this->buttons_) {
         button->updateGeometry();
     }
     QWidget::resizeEvent(event);
 }
 
-void GuessButtonContainer::forEveryButtonDo(void (*func)(GuessButton *)) {
+void GuessButtonsHandler::forEveryButtonDo(void (*func)(GuessButton *)) {
     for(auto it = this->buttons_.begin(); it != this->buttons_.end(); it++) {
         func(*it);
     }
 }
 
-QSize GuessButtonContainer::sizeHint() const {
+QSize GuessButtonsHandler::sizeHint() const {
     QSize originalSizeHint = QWidget::sizeHint();
     int height = (this->parentWidget()->parentWidget()->height() - this->parentWidget()->layout()->contentsMargins().top()*2 - this->parentWidget()->layout()->spacing()*11)/12;
     //qInfo() << height;
     return QSize(originalSizeHint.width(), height);
 }
 
-QVector<QColor> GuessButtonContainer::getFullGuess() {
+QVector<QColor> GuessButtonsHandler::getFullGuess() {
     QVector<QColor> colors;
     for(auto button : this->buttons_) {
         colors.push_back(button->getColor());
@@ -120,7 +120,7 @@ QVector<QColor> GuessButtonContainer::getFullGuess() {
     return colors;
 }
 
-bool GuessButtonContainer::isCurrentGuessValid() {
+bool GuessButtonsHandler::isCurrentGuessValid() {
     auto colors = this->getFullGuess();
     bool valid = std::accumulate(colors.begin(), colors.end(), true, [](bool rest, QColor color) { return rest && color != QColor(0,0,0); } );
     return valid;

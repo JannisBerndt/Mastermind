@@ -40,11 +40,11 @@ private:
     QColor color_;
 };
 
-class GuessButtonContainer : public QWidget {
+class GuessButtonsHandler : public QWidget {
     Q_OBJECT
 
 public:
-    GuessButtonContainer(QWidget* parent = nullptr);
+    GuessButtonsHandler(QWidget* parent = nullptr);
     QVector<GuessButton*> getButtons();
     void resizeEvent(QResizeEvent *event) override;
     void forEveryButtonDo(void (*func) (GuessButton*));

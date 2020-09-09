@@ -34,7 +34,7 @@ Game::Game(QMainWindow* mainwindow, QWidget *parent) : QWidget(parent) {
         label->setFixedWidth(15);
         gridLayout->addWidget(label, i, 0);
 
-        GuessButtonContainer* buttonContainer = new GuessButtonContainer(scrollAreaWidget);
+        GuessButtonsHandler* buttonContainer = new GuessButtonsHandler(scrollAreaWidget);
         if(i != 11) buttonContainer->forEveryButtonDo([](GuessButton* button) {button->setEnabled(false);} );
         for(auto button : buttonContainer->getButtons()) {
             connect(button, SIGNAL(clicked()), this, SLOT(putColorGuess()));
@@ -84,7 +84,7 @@ void Game::putColorGuess() {
     button->setColor(this->colorButtonsHandler_->getSelectedColor());
     // check if all four are filled
 
-    if(qobject_cast<GuessButtonContainer*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->isCurrentGuessValid()) {
+    if(qobject_cast<GuessButtonsHandler*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->isCurrentGuessValid()) {
         // show "Submit" Button
         this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 2)->widget()->setVisible(true);
     }
@@ -93,7 +93,7 @@ void Game::putColorGuess() {
 void Game::submitGuess() {
     assert(this->numCurrentGuess_ <= 12);
     // gather current guess
-    QVector<QColor> guess = qobject_cast<GuessButtonContainer*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->getFullGuess();
+    QVector<QColor> guess = qobject_cast<GuessButtonsHandler*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->getFullGuess();
     // produce hint
     auto hint = this->checkGuess(guess);
     // remove Submit button
@@ -109,8 +109,8 @@ void Game::submitGuess() {
         // Submitted the last Try and lost
         this->endGame(false);
     } else {
-        qobject_cast<GuessButtonContainer*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->forEveryButtonDo([](GuessButton* button) {button->setEnabled(false);} );
-        qobject_cast<GuessButtonContainer*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_ - 1, 1)->widget())->forEveryButtonDo([](GuessButton* button) {button->setEnabled(true);} );
+        qobject_cast<GuessButtonsHandler*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->forEveryButtonDo([](GuessButton* button) {button->setEnabled(false);} );
+        qobject_cast<GuessButtonsHandler*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_ - 1, 1)->widget())->forEveryButtonDo([](GuessButton* button) {button->setEnabled(true);} );
         this->numCurrentGuess_++;
     }
 }
@@ -118,7 +118,7 @@ void Game::submitGuess() {
 void Game::endGame(bool hasWon) {
     qInfo() << "endGame: " << this->mainwindow_->width() << ", " << this->mainwindow_->height() << ", " << this->parentWidget()->objectName();
     for(int i = 1; i < 5; i++) {
-        qobject_cast<GuessButtonContainer*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->forEveryButtonDo([](GuessButton* button) {button->setEnabled(false);} );
+        qobject_cast<GuessButtonsHandler*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->forEveryButtonDo([](GuessButton* button) {button->setEnabled(false);} );
     }
     EndScreen* end = new EndScreen(hasWon, this->mainwindow_);
     this->endScreen_ = end;
