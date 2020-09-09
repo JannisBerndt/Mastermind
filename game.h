@@ -2,6 +2,8 @@
 #define GAME_H
 
 #include "mainwindow.h"
+#include "colorselectbutton.h"
+
 #include <QWidget>
 #include <QScrollArea>
 #include <QGridLayout>
@@ -18,26 +20,6 @@ public:
 
 private:
     QWidget* blocker_;
-};
-
-class ColorSelectButtonsHandler : public QWidget {
-    Q_OBJECT
-
-public:
-    ColorSelectButtonsHandler(QVector<QColor> colors, QWidget* parent = nullptr);
-    void resizeEvent(QResizeEvent *event) override;
-    QColor getSelectedColor();
-    QSize sizeHint() const override;
-    void setHeight(int newHeight);
-
-private slots:
-    void selectColor();
-
-private:
-    QVector<QColor> colors_;
-    QColor selectedColor_;
-    QVector<ColorSelectButton*> buttons_;
-    int height_;
 };
 
 class Game : public QWidget {
@@ -66,6 +48,17 @@ private:
     QVector<int> checkGuess(QVector<QColor> guess);
     void endGame(bool hasWon);
     void paintEvent(QPaintEvent *event) override;
+};
+
+class HintViewer : public QWidget {
+    Q_OBJECT
+
+public:
+    HintViewer(QVector<int> hint, QWidget* parent = nullptr);
+    void paintEvent(QPaintEvent *event) override;
+
+private:
+    QVector<int> hint_;
 };
 
 #endif // GAME_H

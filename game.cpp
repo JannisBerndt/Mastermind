@@ -1,5 +1,5 @@
 #include "game.h"
-#include "mainwindow.h"
+#include "guessbutton.h"
 
 #include <QScrollArea>
 #include <QGridLayout>
@@ -274,46 +274,32 @@ QWidget* EndScreen::getBlocker() {
     return this->blocker_;
 }
 
-ColorSelectButtonsHandler::ColorSelectButtonsHandler(QVector<QColor> colors, QWidget* parent) : QWidget(parent) {
-    this->colors_ = colors;
-    QHBoxLayout* colorSelectButtonsLayout = new QHBoxLayout(this);
-    colorSelectButtonsLayout->setContentsMargins(0, 7, 0, 7);
-    for(int i = 0; i < colors.length(); i++) {
-        ColorSelectButton* button = new ColorSelectButton(this->colors_[i], this);
-        if(i == 0) {
-            button->setChecked(true);
-            this->selectedColor_ = colors_[i];
+HintViewer::HintViewer(QVector<int> hint, QWidget* parent) : QWidget(parent), hint_(hint) {
+
+}
+
+void HintViewer::paintEvent(QPaintEvent *event) {
+    QWidget::paintEvent(event);
+    QPainter painter(this);
+    QColor neutral = Qt::green;
+    int width = size().width();
+    int height = size().height();
+    int length = qMin(width, height);
+    painter.fillRect((width-length)/2, 0, length, length, neutral);
+    qInfo() << this->hint_[0] << ", " << this->hint_[1] << ", " << this->hint_[2] << ", " << this->hint_[3];
+    for(int i = 0; i < this->hint_.length()/2; i++) {
+        for(int j = 0; j < this->hint_.length()/2; j++) {
+            QColor color;
+            int index = i + ((i>0)? j+1 : j);
+            switch(this->hint_[index]) {
+            case -1: color = neutral; break;
+            case 0: color = Qt::white; break;
+            case 1: color = Qt::black; break;
+            default: color = Qt::red; break;
+            }
+            painter.setBrush(color);
+            painter.setPen(color);
+            if (color != neutral) painter.drawEllipse(QPointF((width-length)/2 + length/4 + length/2*i, 0 + length/4 + length/2*j), length/4 - 2, length/4 - 2);
         }
-        connect(button, SIGNAL(clicked()),this, SLOT(selectColor()));
-        this->buttons_.push_back(button);
-        colorSelectButtonsLayout->addWidget(button);
     }
-    this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-    this->height_ = 40;
-}
-
-void ColorSelectButtonsHandler::selectColor() {
-    ColorSelectButton* button = qobject_cast<ColorSelectButton*>(sender());
-    this->selectedColor_ = button->getColor();
-}
-
-QColor ColorSelectButtonsHandler::getSelectedColor() {
-    return this->selectedColor_;
-}
-
-void ColorSelectButtonsHandler::resizeEvent(QResizeEvent *event) {
-    for(auto button : this->buttons_) {
-        button->updateGeometry();
-        //qInfo() << button->width() - button->height();
-    }
-    QWidget::resizeEvent(event);
-}
-
-QSize ColorSelectButtonsHandler::sizeHint() const {
-    //qInfo() << "ColorSelectButtonsHandler::sizeHint, height = " << this->height_;
-    return QSize(this->width(), this->height_);
-}
-
-void ColorSelectButtonsHandler::setHeight(int newHeight) {
-    this->height_ = newHeight;
 }

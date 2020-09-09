@@ -16,12 +16,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    colorselectbutton.cpp \
     game.cpp \
+    guessbutton.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    colorselectbutton.h \
     game.h \
+    guessbutton.h \
     mainwindow.h
 
 FORMS += \
