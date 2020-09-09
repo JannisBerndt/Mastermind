@@ -45,6 +45,7 @@ QColor GuessButton::getColor() {
 
 void GuessButton::setColor(QColor newColor) {
     this->color_ = newColor;
+    this->repaint();
 }
 
 void GuessButton::paintEvent(QPaintEvent *event) {
