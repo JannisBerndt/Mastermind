@@ -21,7 +21,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_1">
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -87,7 +87,7 @@
            <number>6</number>
           </property>
           <item>
-           <widget class="QPushButton" name="pushButton_51">
+           <widget class="QPushButton" name="menuButton">
             <property name="text">
              <string>Menü</string>
             </property>
@@ -144,7 +144,7 @@
              <x>0</x>
              <y>0</y>
              <width>461</width>
-             <height>492</height>
+             <height>507</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout">
@@ -271,7 +271,7 @@
      <x>0</x>
      <y>0</y>
      <width>507</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

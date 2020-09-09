@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->ui->settingsButton->setGraphicsEffect(shadow2);
     connect(this->ui->playButton, SIGNAL(clicked()), this, SLOT(playGame()));
     this->setObjectName("mainwindow");
+    connect(this->ui->menuButton, SIGNAL(clicked()), this, SLOT(returnToMenu()));
 }
 
 MainWindow::~MainWindow()
@@ -130,8 +131,14 @@ bool GuessButtonsHandler::isCurrentGuessValid() {
 
 void MainWindow::playGame() {
     this->ui->stackedWidget->setCurrentIndex(1);
-    Game* currentGame = new Game(this, this->ui->page_2);
-    addWidgetToPage("page_2", currentGame);
+    if(true) {
+        Game* currentGame_ = new Game(this, this->ui->page_2);
+        addWidgetToPage("page_2", currentGame_);
+    }
+}
+
+void MainWindow::returnToMenu() {
+    this->ui->stackedWidget->setCurrentIndex(0);
 }
 
 void MainWindow::addWidgetToPage(QString pageName, QWidget* widget) {

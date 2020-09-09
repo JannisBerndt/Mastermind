@@ -18,6 +18,7 @@ public:
 
 private slots:
     void playGame();
+    void returnToMenu();
 
 private:
     Ui::MainWindow *ui;
