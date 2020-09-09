@@ -139,6 +139,7 @@ void MainWindow::addWidgetToPage(QString pageName, QWidget* widget) {
 ColorSelectButton::ColorSelectButton(QColor color, QWidget* parent) : QRadioButton(parent), color_(color) {
     this->setMinimumWidth(30);
     this->setMinimumHeight(30);
+    this->setStyleSheet("::indicator {width: " + QString::number(this->width()) + "; height: " + QString::number(this->height()) + ";}");
     QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect;
     shadow->setColor(Qt::black);
     shadow->setBlurRadius(10);
@@ -167,6 +168,11 @@ void ColorSelectButton::paintEvent(QPaintEvent *event) {
     radialGradient.setColorAt(1, this->color_);
     painter.fillPath(path, radialGradient);
     painter.drawPath(path);
+}
+
+void ColorSelectButton::resizeEvent(QResizeEvent *event) {
+    this->setStyleSheet("::indicator {width: " + QString::number(this->width()) + "; height: " + QString::number(this->height()) + ";}");
+    QRadioButton::resizeEvent(event);
 }
 
 QSize ColorSelectButton::sizeHint() const {
