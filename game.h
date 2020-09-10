@@ -1,12 +1,13 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "mainwindow.h"
-#include "colorselectbutton.h"
-
 #include <QWidget>
 #include <QScrollArea>
 #include <QGridLayout>
+
+class MainWindow;
+#include "mainwindow.h"
+#include "colorselectbutton.h"
 
 class EndScreen : public QWidget {
     Q_OBJECT

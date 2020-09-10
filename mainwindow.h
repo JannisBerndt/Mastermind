@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 
+class Game;
+#include "game.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -22,6 +25,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    Game* currentGame_ = nullptr;
 };
 
 #endif // MAINWINDOW_H
