@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this->ui->playButton, SIGNAL(clicked()), this, SLOT(playGame()));
     this->setObjectName("mainwindow");
     connect(this->ui->menuButton, SIGNAL(clicked()), this, SLOT(returnToMenu()));
+    connect(this->ui->newGameButton, SIGNAL(clicked()), this, SLOT(newGame()));
 }
 
 MainWindow::~MainWindow()
@@ -50,6 +51,13 @@ void MainWindow::playGame() {
 
 void MainWindow::returnToMenu() {
     this->ui->stackedWidget->setCurrentIndex(0);
+}
+
+void MainWindow::newGame() {
+    assert(this->currentGame_);
+    delete this->currentGame_;
+    this->currentGame_ = new Game(this, this->ui->page_2);
+    addWidgetToPage("page_2", this->currentGame_);
 }
 
 void MainWindow::addWidgetToPage(QString pageName, QWidget* widget) {

@@ -251,7 +251,7 @@ EndScreen::EndScreen(bool hasWon, QWidget* parent) : QWidget(parent) {
     int width = parent->findChild<Game*>("game")->width()*0.6;
     int height = parent->findChild<Game*>("game")->height()*0.6;
     this->setGeometry((parent->width()-width)/2, (parent->height()-height)/2, width, height);
-    connect(newGame, SIGNAL(clicked()), this->parentWidget(), SLOT(returnToMenu()));
+    connect(newGame, SIGNAL(clicked()), this->parentWidget(), SLOT(newGame()));
     connect(back, SIGNAL(clicked()), this->parentWidget(), SLOT(returnToMenu()));
     connect(newGame, SIGNAL(clicked()), this, SLOT(remove()));
     connect(back, SIGNAL(clicked()), this, SLOT(remove()));

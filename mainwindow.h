@@ -22,6 +22,7 @@ public:
 private slots:
     void playGame();
     void returnToMenu();
+    void newGame();
 
 private:
     Ui::MainWindow *ui;

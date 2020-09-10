@@ -94,7 +94,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_52">
+           <widget class="QPushButton" name="newGameButton">
             <property name="text">
              <string>Neues Spiel</string>
             </property>
@@ -143,8 +143,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>461</width>
-             <height>507</height>
+             <width>261</width>
+             <height>135</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout">
