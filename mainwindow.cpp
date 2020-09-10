@@ -36,6 +36,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::playGame() {
     this->ui->stackedWidget->setCurrentIndex(1);
+    if(this->currentGame_) {
+        if(this->currentGame_->hasEnded) {
+            delete this->currentGame_;
+            this->currentGame_ = nullptr;
+        }
+    }
     if(!this->currentGame_) {
         this->currentGame_ = new Game(this, this->ui->page_2);
         addWidgetToPage("page_2", this->currentGame_);

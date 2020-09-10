@@ -34,6 +34,7 @@ public:
     QLayout* getContentLayout();
     void resizeEvent(QResizeEvent *event) override;
     void setEndscreen(EndScreen* newEndScreen);
+    bool hasEnded;
 
 private slots:
     void putColorGuess();

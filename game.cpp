@@ -123,6 +123,7 @@ void Game::endGame(bool hasWon) {
     }
     EndScreen* end = new EndScreen(hasWon, this->mainwindow_);
     this->endScreen_ = end;
+    this->hasEnded = true;
 }
 
 void Game::generateCode() {
@@ -285,8 +286,8 @@ QWidget* EndScreen::getBlocker() {
 
 void EndScreen::remove() {
     this->parentWidget()->findChild<Game*>("game")->setEndscreen();
-    delete this;
     delete this->blocker_;
+    delete this;
 }
 
 HintViewer::HintViewer(QVector<int> hint, QWidget* parent) : QWidget(parent), hint_(hint) {
