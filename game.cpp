@@ -1,5 +1,6 @@
 #include "game.h"
 #include "guessbutton.h"
+#include "mainwindow.h"
 
 #include <QScrollArea>
 #include <QGridLayout>
@@ -183,6 +184,10 @@ void Game::paintEvent(QPaintEvent *event) {
     QWidget::paintEvent(event);
 }
 
+void Game::setEndscreen(EndScreen *newEndScreen = nullptr) {
+    this->endScreen_ = newEndScreen;
+}
+
 EndScreen::EndScreen(bool hasWon, QWidget* parent) : QWidget(parent) {
     QVBoxLayout* layout = new QVBoxLayout(this);
     QHBoxLayout* buttonsLayout = new QHBoxLayout;
@@ -245,6 +250,10 @@ EndScreen::EndScreen(bool hasWon, QWidget* parent) : QWidget(parent) {
     int width = parent->findChild<Game*>("game")->width()*0.6;
     int height = parent->findChild<Game*>("game")->height()*0.6;
     this->setGeometry((parent->width()-width)/2, (parent->height()-height)/2, width, height);
+    connect(newGame, SIGNAL(clicked()), this->parentWidget(), SLOT(returnToMenu()));
+    connect(back, SIGNAL(clicked()), this->parentWidget(), SLOT(returnToMenu()));
+    connect(newGame, SIGNAL(clicked()), this, SLOT(remove()));
+    connect(back, SIGNAL(clicked()), this, SLOT(remove()));
 }
 
 QSize EndScreen::sizeHint() const {
@@ -272,6 +281,12 @@ void EndScreen::moveEvent(QMoveEvent *event) {
 
 QWidget* EndScreen::getBlocker() {
     return this->blocker_;
+}
+
+void EndScreen::remove() {
+    this->parentWidget()->findChild<Game*>("game")->setEndscreen();
+    delete this;
+    delete this->blocker_;
 }
 
 HintViewer::HintViewer(QVector<int> hint, QWidget* parent) : QWidget(parent), hint_(hint) {

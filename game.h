@@ -19,6 +19,9 @@ public:
     void moveEvent(QMoveEvent *event) override;
     QWidget* getBlocker();
 
+private slots:
+    void remove();
+
 private:
     QWidget* blocker_;
 };
@@ -30,6 +33,7 @@ public:
     Game(QMainWindow* mainwindow, QWidget *parent = nullptr);
     QLayout* getContentLayout();
     void resizeEvent(QResizeEvent *event) override;
+    void setEndscreen(EndScreen* newEndScreen);
 
 private slots:
     void putColorGuess();
