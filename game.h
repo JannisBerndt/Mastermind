@@ -47,6 +47,7 @@ public:
     Solution(Game* parent = nullptr);
     QSize sizeHint() const override;
     void resizeEvent(QResizeEvent* event) override;
+    void reveal();
 
 private:
     QVector<QColor> code_;

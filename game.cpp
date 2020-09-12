@@ -34,6 +34,7 @@ Game::Game(QMainWindow* mainwindow, QWidget *parent) : QWidget(parent) {
     this->uiContentLayout_ = contentLayout;
     this->uiGridLayout_ = gridLayout;
     this->solution_ = solution;
+    solution->hide();
 
     for(int i = 0; i < 12; i++) {
         QLabel* label = new QLabel(scrollAreaWidget);
@@ -120,7 +121,8 @@ void Game::submitGuess() {
 }
 
 void Game::endGame(bool hasWon) {
-    qInfo() << "endGame: " << this->mainwindow_->width() << ", " << this->mainwindow_->height() << ", " << this->parentWidget()->objectName();
+    //qInfo() << "endGame: " << this->mainwindow_->width() << ", " << this->mainwindow_->height() << ", " << this->parentWidget()->objectName();
+    this->solution_->reveal();
     for(int i = 1; i < 5; i++) {
         qobject_cast<GuessButtonsHandler*>(this->uiGridLayout_->itemAtPosition(12 - this->numCurrentGuess_, 1)->widget())->forEveryButtonDo([](GuessButton* button) {button->setEnabled(false);} );
     }
@@ -408,8 +410,13 @@ QSize Solution::sizeHint() const {
 }
 
 void Solution::resizeEvent(QResizeEvent *event) {
+    qInfo() << "Hi";
     for(auto pin : this->pins_) {
         pin->updateGeometry();
     }
     QWidget::resizeEvent(event);
+}
+
+void Solution::reveal() {
+    this->show();
 }
