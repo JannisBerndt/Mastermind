@@ -26,6 +26,34 @@ private:
     QWidget* blocker_;
 };
 
+class Pin : public QWidget {
+    Q_OBJECT
+
+public:
+    Pin(QColor color = Qt::black, QWidget* parent = nullptr);
+    void setColor(QColor newColor);
+    QColor getColor();
+    QSize sizeHint() const override;
+    void paintEvent(QPaintEvent* event) override;
+
+private:
+    QColor color_;
+};
+
+class Solution : public QWidget {
+    Q_OBJECT
+
+public:
+    Solution(Game* parent = nullptr);
+    QSize sizeHint() const override;
+    void resizeEvent(QResizeEvent* event) override;
+
+private:
+    QVector<QColor> code_;
+    int height_;
+    QVector<Pin*> pins_;
+};
+
 class Game : public QWidget {
     Q_OBJECT
 
@@ -35,6 +63,8 @@ public:
     void resizeEvent(QResizeEvent *event) override;
     void setEndscreen(EndScreen* newEndScreen);
     bool hasEnded;
+    QVector<QColor> getCode();
+    int getCurrentPinHeight();
 
 private slots:
     void putColorGuess();
@@ -49,6 +79,7 @@ private:
     EndScreen* endScreen_ = nullptr;
     QMainWindow* mainwindow_;
     ColorSelectButtonsHandler* colorButtonsHandler_;
+    Solution* solution_;
 
     void generateCode();
     QVector<int> checkGuess(QVector<QColor> guess);

@@ -15,19 +15,25 @@
 #include <QResizeEvent>
 
 Game::Game(QMainWindow* mainwindow, QWidget *parent) : QWidget(parent) {
+    QVector<QColor> colors = {QColor(222, 222, 222), QColor(168, 17, 17), QColor(245, 241, 10), QColor(11, 128, 37), QColor(11, 32, 219), QColor(219, 11, 181)};
+    this->colors_ = colors;
+    this->generateCode();
     this->setObjectName("game");
     this->mainwindow_ = mainwindow;
     QVBoxLayout* contentLayout = new QVBoxLayout(this); // already does this->setLayout(contentLayout);
     QScrollArea* scrollArea = new QScrollArea(this);
     QWidget* scrollAreaWidget = new QWidget(scrollArea);
     QGridLayout* gridLayout = new QGridLayout(scrollAreaWidget); // already does scrollAreaContentWidget->setLayout(gridLayout);
+    Solution* solution = new Solution(this);
     scrollArea->setWidget(scrollAreaWidget);
     scrollArea->setWidgetResizable(true);
     scrollAreaWidget->setVisible(true);
+    contentLayout->addWidget(solution);
     contentLayout->addWidget(scrollArea);
     contentLayout->setContentsMargins(0, 0, 0, 0);
     this->uiContentLayout_ = contentLayout;
     this->uiGridLayout_ = gridLayout;
+    this->solution_ = solution;
 
     for(int i = 0; i < 12; i++) {
         QLabel* label = new QLabel(scrollAreaWidget);
@@ -68,12 +74,9 @@ Game::Game(QMainWindow* mainwindow, QWidget *parent) : QWidget(parent) {
         button->setVisible(false);
     }
 
-    QVector<QColor> colors = {QColor(222, 222, 222), QColor(168, 17, 17), QColor(245, 241, 10), QColor(11, 128, 37), QColor(11, 32, 219), QColor(219, 11, 181)};
-    this->colors_ = colors;
     this->colorButtonsHandler_ = new ColorSelectButtonsHandler(colors, this);
     contentLayout->addWidget(this->colorButtonsHandler_);
     this->numCurrentGuess_ = 1;
-    this->generateCode();
 }
 
 QLayout* Game::getContentLayout() {
@@ -178,6 +181,7 @@ void Game::resizeEvent(QResizeEvent *event) {
     this->colorButtonsHandler_->setHeight(this->uiGridLayout_->itemAtPosition(0, 1)->widget()->height()+14);
     //this->updateGeometry();
     this->colorButtonsHandler_->updateGeometry();
+    this->solution_->updateGeometry();
     QWidget::resizeEvent(event);
 }
 
@@ -189,17 +193,49 @@ void Game::setEndscreen(EndScreen *newEndScreen = nullptr) {
     this->endScreen_ = newEndScreen;
 }
 
+QVector<QColor> Game::getCode() {
+    return this->code_;
+}
+
+int Game::getCurrentPinHeight() {
+    return this->uiGridLayout_->itemAtPosition(0, 1)->widget()->height();
+}
+
 EndScreen::EndScreen(bool hasWon, QWidget* parent) : QWidget(parent) {
     QVBoxLayout* layout = new QVBoxLayout(this);
     QHBoxLayout* buttonsLayout = new QHBoxLayout;
+    QHBoxLayout* buttonsLayout2 = new QHBoxLayout;
+    QSpacerItem* spacer = new QSpacerItem(50, 30, QSizePolicy::Expanding, QSizePolicy::Ignored);
     QLabel* heading = new QLabel((hasWon) ? "You have Won!" : "You Lost!");
     QPushButton* newGame = new QPushButton("Neues Spiel");
     QPushButton* back = new QPushButton("Zurück zum Menü");
+    QPushButton* close = new QPushButton("X");
+    layout->addLayout(buttonsLayout2);
     layout->addWidget(heading);
     layout->addLayout(buttonsLayout);
+    buttonsLayout2->addItem(spacer);
+    buttonsLayout2->addWidget(close);
     buttonsLayout->addWidget(newGame);
     buttonsLayout->addWidget(back);
     this->setVisible(true);
+
+    buttonsLayout2->setMargin(10);
+    buttonsLayout2->setSpacing(15);
+    close->setFixedSize(30, 30);
+    close->setStyleSheet("QPushButton {"
+                            "padding: 5px;"
+                            "font: 8pt 'MS Shell Dlg 2';"
+                            "border: 3px solid #e63939;"
+                            "background-color: #e64e4e;"
+                            "border-radius: 15px;}"
+                          ":pressed {"
+                            "background-color: #d64545;"
+                          "}");
+    QGraphicsDropShadowEffect* shadow4 = new QGraphicsDropShadowEffect;
+    shadow4->setColor(QColor(230, 57, 57));
+    shadow4->setBlurRadius(10);
+    shadow4->setOffset(QPointF(0, 0));
+    close->setGraphicsEffect(shadow4);
 
     buttonsLayout->setMargin(10);
     buttonsLayout->setSpacing(15);
@@ -255,6 +291,7 @@ EndScreen::EndScreen(bool hasWon, QWidget* parent) : QWidget(parent) {
     connect(back, SIGNAL(clicked()), this->parentWidget(), SLOT(returnToMenu()));
     connect(newGame, SIGNAL(clicked()), this, SLOT(remove()));
     connect(back, SIGNAL(clicked()), this, SLOT(remove()));
+    connect(close, SIGNAL(clicked()), this, SLOT(remove()));
 }
 
 QSize EndScreen::sizeHint() const {
@@ -304,7 +341,7 @@ void HintViewer::paintEvent(QPaintEvent *event) {
     int height = size().height();
     int length = qMin(width, height);
     painter.fillRect((width-length)/2, 0, length, length, neutral);
-    qInfo() << this->hint_[0] << ", " << this->hint_[1] << ", " << this->hint_[2] << ", " << this->hint_[3];
+    //qInfo() << this->hint_[0] << ", " << this->hint_[1] << ", " << this->hint_[2] << ", " << this->hint_[3];
     for(int i = 0; i < this->hint_.length()/2; i++) {
         for(int j = 0; j < this->hint_.length()/2; j++) {
             QColor color;
@@ -320,4 +357,59 @@ void HintViewer::paintEvent(QPaintEvent *event) {
             if (color != neutral) painter.drawEllipse(QPointF((width-length)/2 + length/4 + length/2*i, 0 + length/4 + length/2*j), length/4 - 2, length/4 - 2);
         }
     }
+}
+
+Pin::Pin(QColor color, QWidget* parent) : QWidget(parent), color_(color) {
+    this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+}
+
+void Pin::setColor(QColor newColor) {
+    this->color_ = newColor;
+}
+
+QColor Pin::getColor() {
+    return this->color_;
+}
+
+QSize Pin::sizeHint() const {
+    int parentVerticalMargins = this->parentWidget()->layout()->contentsMargins().top() + this->parentWidget()->layout()->contentsMargins().bottom();
+    int length = qMin(this->parentWidget()->height()-parentVerticalMargins, (this->parentWidget()->width() - (this->parentWidget()->layout()->spacing()*3))/4);
+    return QSize(length, length);
+}
+
+void Pin::paintEvent(QPaintEvent *event) {
+    qInfo() << this->size();
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    QPainterPath path;
+    path.addEllipse(QRectF(0, 0, this->width(), this->height()));
+    QRadialGradient radialGradient(QPointF(this->width()/2, this->height()/2), this->height()/2, QPointF(this->width()/2.5, this->height()/2.5));
+    radialGradient.setColorAt(0, Qt::white);
+    radialGradient.setColorAt(1, this->color_);
+    painter.fillPath(path, radialGradient);
+}
+
+Solution::Solution(Game* parent) : QWidget(parent), code_(parent->getCode()) {
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 7, 0, 7);
+    for(auto color : this->code_) {
+        Pin* pin = new Pin(color, this);
+        pin->show();
+        this->pins_.push_back(pin);
+        layout->addWidget(pin);
+    }
+    this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    this->show();
+}
+
+QSize Solution::sizeHint() const {
+    int height = this->layout()->contentsMargins().top() + this->layout()->contentsMargins().bottom() + qobject_cast<Game*>(this->parentWidget())->getCurrentPinHeight();
+    return QSize(QWidget::sizeHint().width(), height);
+}
+
+void Solution::resizeEvent(QResizeEvent *event) {
+    for(auto pin : this->pins_) {
+        pin->updateGeometry();
+    }
+    QWidget::resizeEvent(event);
 }
