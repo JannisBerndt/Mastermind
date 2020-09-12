@@ -285,7 +285,9 @@ QWidget* EndScreen::getBlocker() {
 }
 
 void EndScreen::remove() {
-    this->parentWidget()->findChild<Game*>("game")->setEndscreen();
+    if(this->parentWidget()->findChild<Game*>("game")) {
+        this->parentWidget()->findChild<Game*>("game")->setEndscreen();
+    }
     delete this->blocker_;
     delete this;
 }

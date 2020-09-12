@@ -27,6 +27,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     Game* currentGame_ = nullptr;
+    void removeCurrentGameIfExists();
 };
 
 #endif // MAINWINDOW_H

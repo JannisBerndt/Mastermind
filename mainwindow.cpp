@@ -37,12 +37,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::playGame() {
     this->ui->stackedWidget->setCurrentIndex(1);
-    if(this->currentGame_) {
-        if(this->currentGame_->hasEnded) {
-            delete this->currentGame_;
-            this->currentGame_ = nullptr;
-        }
-    }
+    removeCurrentGameIfExists();
     if(!this->currentGame_) {
         this->currentGame_ = new Game(this, this->ui->page_2);
         addWidgetToPage("page_2", this->currentGame_);
@@ -51,6 +46,7 @@ void MainWindow::playGame() {
 
 void MainWindow::returnToMenu() {
     this->ui->stackedWidget->setCurrentIndex(0);
+    removeCurrentGameIfExists();
 }
 
 void MainWindow::newGame() {
@@ -62,4 +58,13 @@ void MainWindow::newGame() {
 
 void MainWindow::addWidgetToPage(QString pageName, QWidget* widget) {
     qobject_cast<QVBoxLayout*>(this->findChild<QWidget*>(pageName)->layout())->addWidget(widget);
+}
+
+void MainWindow::removeCurrentGameIfExists() {
+    if(this->currentGame_) {
+        if(this->currentGame_->hasEnded) {
+            delete this->currentGame_;
+            this->currentGame_ = nullptr;
+        }
+    }
 }
