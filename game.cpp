@@ -13,6 +13,8 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QResizeEvent>
+#include <QPropertyAnimation>
+#include <QParallelAnimationGroup>
 
 Game::Game(QMainWindow* mainwindow, QWidget *parent) : QWidget(parent) {
     QVector<QColor> colors = {QColor(222, 222, 222), QColor(168, 17, 17), QColor(245, 241, 10), QColor(11, 128, 37), QColor(11, 32, 219), QColor(219, 11, 181)};
@@ -34,7 +36,7 @@ Game::Game(QMainWindow* mainwindow, QWidget *parent) : QWidget(parent) {
     this->uiContentLayout_ = contentLayout;
     this->uiGridLayout_ = gridLayout;
     this->solution_ = solution;
-    solution->hide();
+    //solution->hide();
 
     for(int i = 0; i < 12; i++) {
         QLabel* label = new QLabel(scrollAreaWidget);
@@ -200,7 +202,7 @@ QVector<QColor> Game::getCode() {
 }
 
 int Game::getCurrentPinHeight() {
-    return this->uiGridLayout_->itemAtPosition(0, 1)->widget()->height();
+    return qobject_cast<GuessButtonsHandler*>(this->uiGridLayout_->itemAtPosition(0, 1)->widget())->getButtons()[0]->height();
 }
 
 EndScreen::EndScreen(bool hasWon, QWidget* parent) : QWidget(parent) {
@@ -362,7 +364,7 @@ void HintViewer::paintEvent(QPaintEvent *event) {
 }
 
 Pin::Pin(QColor color, QWidget* parent) : QWidget(parent), color_(color) {
-    this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    this->setMinimumSize(30, 30);
 }
 
 void Pin::setColor(QColor newColor) {
@@ -373,14 +375,7 @@ QColor Pin::getColor() {
     return this->color_;
 }
 
-QSize Pin::sizeHint() const {
-    int parentVerticalMargins = this->parentWidget()->layout()->contentsMargins().top() + this->parentWidget()->layout()->contentsMargins().bottom();
-    int length = qMin(this->parentWidget()->height()-parentVerticalMargins, (this->parentWidget()->width() - (this->parentWidget()->layout()->spacing()*3))/4);
-    return QSize(length, length);
-}
-
-void Pin::paintEvent(QPaintEvent *event) {
-    qInfo() << this->size();
+void Pin::paintEvent(QPaintEvent*) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     QPainterPath path;
@@ -402,6 +397,8 @@ Solution::Solution(Game* parent) : QWidget(parent), code_(parent->getCode()) {
     }
     this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     this->show();
+    this->setMaximumHeight(0);
+    this->pos_ = this->pos();
 }
 
 QSize Solution::sizeHint() const {
@@ -410,13 +407,37 @@ QSize Solution::sizeHint() const {
 }
 
 void Solution::resizeEvent(QResizeEvent *event) {
-    qInfo() << "Hi";
+    int height = qobject_cast<Game*>(this->parentWidget())->getCurrentPinHeight();
     for(auto pin : this->pins_) {
-        pin->updateGeometry();
+        pin->setFixedSize(height, height);
     }
     QWidget::resizeEvent(event);
 }
 
+void Solution::paintEvent(QPaintEvent *event) {
+    QWidget::paintEvent(event);
+    QPainter painter(this);
+    painter.drawRect(0, 0, this->width()-1, this->height()-1);
+}
+
+void Solution::moveEvent(QMoveEvent *event) {
+    QWidget::moveEvent(event);
+    if(!(this->pos_ == event->pos())) {
+        this->move(this->pos_);
+    }
+}
+
 void Solution::reveal() {
-    this->show();
+    int height = this->layout()->contentsMargins().top() + this->layout()->contentsMargins().bottom() + qobject_cast<Game*>(this->parentWidget())->getCurrentPinHeight();
+    QPropertyAnimation* animation = new QPropertyAnimation(this, "minimumHeight");
+    animation->setDuration(1500);
+    animation->setStartValue(this->height());
+    animation->setEndValue(height);
+    animation->start();
+    connect(animation, SIGNAL(finished()), this, SLOT(afterAnimation()));
+    qInfo() << "Hi";
+}
+
+void Solution::afterAnimation() {
+    this->setMaximumHeight(16777215);
 }
