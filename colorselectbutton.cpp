@@ -1,5 +1,6 @@
 #include "colorselectbutton.h"
 #include "ui_mainwindow.h"
+#include "game.h"
 
 #include <QGraphicsDropShadowEffect>
 #include <QPainter>
@@ -64,7 +65,6 @@ ColorSelectButtonsHandler::ColorSelectButtonsHandler(QVector<QColor> colors, QWi
         colorSelectButtonsLayout->addWidget(button);
     }
     this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-    this->height_ = 40;
 }
 
 void ColorSelectButtonsHandler::selectColor() {
@@ -85,10 +85,6 @@ void ColorSelectButtonsHandler::resizeEvent(QResizeEvent *event) {
 }
 
 QSize ColorSelectButtonsHandler::sizeHint() const {
-    //qInfo() << "ColorSelectButtonsHandler::sizeHint, height = " << this->height_;
-    return QSize(this->width(), this->height_);
-}
-
-void ColorSelectButtonsHandler::setHeight(int newHeight) {
-    this->height_ = newHeight;
+    int height = this->layout()->contentsMargins().top() + this->layout()->contentsMargins().bottom() + qobject_cast<Game*>(this->parentWidget())->getCurrentPinHeight();
+    return QSize(this->width(), height);
 }

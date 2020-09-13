@@ -25,7 +25,6 @@ public:
     void resizeEvent(QResizeEvent *event) override;
     QColor getSelectedColor();
     QSize sizeHint() const override;
-    void setHeight(int newHeight);
 
 private slots:
     void selectColor();
@@ -34,7 +33,6 @@ private:
     QVector<QColor> colors_;
     QColor selectedColor_;
     QVector<ColorSelectButton*> buttons_;
-    int height_;
 };
 
 #endif // COLORSELECTBUTTON_H

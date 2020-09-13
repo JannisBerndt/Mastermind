@@ -182,8 +182,6 @@ void Game::resizeEvent(QResizeEvent *event) {
         qInfo() << "Game::resizeEvent. Game width = " << this->width() << " height = " << this->height() << "\nWindow width = " << newWidth << " height = " << newHeight << "\nx = " << xpos << " y = " << ypos;
         qInfo() << this->parentWidget()->width() << ", " << this->parentWidget()->height();
     }
-    this->colorButtonsHandler_->setHeight(this->uiGridLayout_->itemAtPosition(0, 1)->widget()->height()+14);
-    //this->updateGeometry();
     this->colorButtonsHandler_->updateGeometry();
     this->solution_->updateGeometry();
     QWidget::resizeEvent(event);
