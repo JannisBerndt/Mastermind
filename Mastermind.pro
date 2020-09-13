@@ -20,13 +20,15 @@ SOURCES += \
     game.cpp \
     guessbutton.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    solution.cpp
 
 HEADERS += \
     colorselectbutton.h \
     game.h \
     guessbutton.h \
-    mainwindow.h
+    mainwindow.h \
+    solution.h
 
 FORMS += \
     mainwindow.ui
